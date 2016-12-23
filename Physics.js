@@ -1,6 +1,7 @@
 'use strict';
 var planet = [];
 var entity = [];
+var projectile = [];
 var c;
 var ctx;
 var bcolor = "DDEEFF";
@@ -17,7 +18,7 @@ var id = 4;
   a.xA = 0;
   a.yA = 0;
   a.mass = 25;
-  a.radius = 75;
+  a.radius = 60;
 
   planet.push(a);
 
@@ -50,6 +51,7 @@ var id = 4;
   planet.push(d);
 
   let e = {};
+  e.id = '5';
   e.x = 400;
   e.y = 600;
   e.xV = 0;
@@ -64,6 +66,8 @@ var id = 4;
   e.on = '0';
   e.press = false;
   e.jump = false;
+  e.shoot = 0;
+  e.facing = true; //right = true; left = false;
 
   entity.push(e);
 }
@@ -76,23 +80,56 @@ window.onload = function(){
   document.addEventListener('keydown', (event) => {
     let key = event.key;
     for (let i in entity){
-      if (key == 'd' && entity[i].on != '0' && entity[i].press == false){
-        entity[i].jump = true;
-        entity[i].press = true;
-        entity[i].xV += -1 * Math.cos(Math.PI/2 - entity[i].orientation + .05)*.55;
-        entity[i].yV += Math.sin(Math.PI/2 - entity[i].orientation + .05)*.55;
+      if (key == 'd' && entity[i].press == false){
+        if (entity[i].on != '0') {
+          entity[i].jump = true;
+          entity[i].press = true;
+          entity[i].xV += -1 * Math.cos(Math.PI/2 - entity[i].orientation + .05)*.55;
+          entity[i].yV += Math.sin(Math.PI/2 - entity[i].orientation + .05)*.55;
+          entity[i].facing = true;
+        }
+        else{
+          entity[i].orientation += Math.PI/8;
+          entity[i].press = true;
+        }
       }
-      else if (key == 'a' && entity[i].on != '0' && entity[i].press == false){
-        entity[i].jump = true;
-        entity[i].press = true;
-        entity[i].xV += Math.cos(Math.PI/2 - entity[i].orientation - .05)*.55;
-        entity[i].yV += -1 * Math.sin(Math.PI/2 - entity[i].orientation - .05)*.55;
+      else if (key == 'a' && entity[i].press == false){
+        if (entity[i].on != '0') {
+          entity[i].jump = true;
+          entity[i].press = true;
+          entity[i].xV += Math.cos(Math.PI/2 - entity[i].orientation - .05)*.55;
+          entity[i].yV += -1 * Math.sin(Math.PI/2 - entity[i].orientation - .05)*.55;
+          entity[i].facing = false;
+        }
+        else{
+          entity[i].orientation -= Math.PI/8;
+          entity[i].press = true;
+        }
       }
       else if (key == "w" && entity[i].on != '0' && entity[i].press == false){
         entity[i].jump = true;
         entity[i].press = true;
         entity[i].xV += Math.cos(entity[i].orientation)*.6;
         entity[i].yV += Math.sin(entity[i].orientation)*.6;
+      }
+      else if (key == " " && entity[i].shoot == 0){
+        entity[i].shoot = 50; //shoot delay
+        let p = {}
+        p.x = entity[i].x;
+        p.y = entity[i].y;
+        let dir = entity[i].facing?entity[i].orientation+Math.PI/2:entity[i].orientation-Math.PI/2;
+        p.xV = entity[i].xV + Math.cos(dir) * 1; //power of gun
+        p.yV = entity[i].yV + Math.sin(dir) * 1;
+        p.xA = 0;
+        p.yA = 0;
+        p.radius = 1;
+        p.mass = .0001;
+        p.life = 10000;
+        p.id = entity[i].id;
+        projectile.push(p);
+
+      }
+      else {
       }
     }
   }, false);
@@ -223,6 +260,11 @@ function update(){
   }
 
   for (let i in entity){
+    if (entity[i].shoot>0)
+      entity[i].shoot -=1;
+    else {
+      entity[i].shoot = 0;
+    }
     let xATemp = 0;
     let yATemp = 0;
     if (entity[i].on == '0'){
@@ -275,12 +317,51 @@ function update(){
     entity[i].xA = xATemp;
     entity[i].xV += entity[i].xA;
     entity[i].x += entity[i].xV;
-    entity[i].x += entity[i].xV2;
 
     entity[i].yA = yATemp;
     entity[i].yV += entity[i].yA;
     entity[i].y += entity[i].yV;
-    entity[i].y += entity[i].yV2;
+
+  }
+
+  for (let i = 0; i < projectile.length; i+=1){
+    let xATemp = 0;
+    let yATemp = 0;
+    projectile.life -= 1;
+    for (let j in planet){
+      let r = Math.pow(projectile[i].x - planet[j].x,2) + Math.pow(projectile[i].y - planet[j].y, 2);
+
+      //if collision
+      if (Math.sqrt(r) <= projectile[i].radius + planet[j].radius){
+        projectile[i].flag = true;
+        break;
+      }
+      let force = -1 * (projectile[i].mass * planet[j].mass) / r;
+      let forceX = force * (projectile[i].x - planet[j].x) / Math.sqrt(r);
+      let forceY = force * (projectile[i].y - planet[j].y) / Math.sqrt(r);
+
+      xATemp += forceX/projectile[i].mass;
+      yATemp += forceY/projectile[i].mass;
+    }
+    if (projectile[i].flag == true || projectile[i].life <=0){
+      projectile.splice(i,1);
+      i-=1;
+      continue;
+    }
+    projectile[i].xA = xATemp;
+    projectile[i].xV += projectile[i].xA;
+    projectile[i].x += projectile[i].xV;
+
+
+    projectile[i].yA = yATemp;
+    projectile[i].yV += projectile[i].yA;
+    projectile[i].y += projectile[i].yV;
+
+    if (projectile[i].y + projectile[i].radius < 0 || projectile[i].y - projectile[i].radius > c.height || projectile[i].x + projectile[i].radius < 0 || projectile[i].x - projectile[i].radius > c.width){
+      projectile.splice(i,1);
+      i-=1;
+      continue;
+    }
 
   }
   draw();
@@ -310,6 +391,15 @@ function draw(){
   for (let i in entity){
     ctx.beginPath();
     ctx.arc(entity[i].x, entity[i].y, entity[i].radius, 2*Math.PI, 0);
+    ctx.stroke();
+    ctx.moveTo(entity[i].x, entity[i].y);
+    let dir = entity[i].facing?entity[i].orientation+Math.PI/2:entity[i].orientation-Math.PI/2;
+    ctx.lineTo(entity[i].x+entity[i].radius*2*Math.cos(dir),entity[i].y+entity[i].radius*2*Math.sin(dir));
+    ctx.stroke();
+  }
+  for (let i in projectile){
+    ctx.beginPath();
+    ctx.arc(projectile[i].x, projectile[i].y, projectile[i].radius, 2*Math.PI, 0);
     ctx.stroke();
   }
 }

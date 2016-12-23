@@ -21,17 +21,21 @@
       }
     </style>
     <ul>
+      <li><select id="world">
+        <option value="1">World 1</option>
+        <option value="2">World 2</option>
+      </select></li>
+      <li><button id="load">Load</button></li>
       <li><input type="text" id="mass" value="" placeholder="Mass"></li>
       <li><input type="text" id="radius" value="" placeholder="Radius"></li>
-      <li><a>Static</a></li>
-      <li><input type="checkbox" id="static" value=""></li>
-      <li><a>Player Controlled</a></li>
-      <li><input type="checkbox" id="pc" value=""></li>
+      <li><a>Static</a><input type="checkbox" id="static" value=""></li>
+      <li><a>Player Controlled</a><input type="checkbox" id="pc" value=""></li>
       <li><button id="clear">Clear</button></li>
       <li><input type="text" id="bcolor" value="" placeholder="Background Color"></li>
-      <li><a>Boundries</a></li>
-      <li><input type="checkbox" id="bound" value=""></li>
+      <li><a>Boundries</a><input type="checkbox" id="bound" value=""></li>
       <li><a>CONTROLS: (A) (D) (W) (SPACE)</a></li>
+      <li><a>Load World File</a><input type="file" id="file"></li>
+      <li><button id="open">Open</button></li>
     </ul>
   </body>
 </html>

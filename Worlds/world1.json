@@ -1,0 +1,12 @@
+{
+  "planet": [
+    {"time": 0, "x": 260, "y": 800, "xV": 0, "yV": 0, "mass": 25, "radius": 60, "fixed": true},
+    {"time": 0, "x": 500, "y": 250, "xV": 0.12, "yV": 0.2, "mass": 25, "radius": 60, "fixed": false},
+    {"time": 0, "x": 260, "y": 100, "xV": 0, "yV": 0, "mass": 60, "radius": 75, "fixed": false},
+    {"time": 0, "x": 1200, "y": 450, "xV": 0, "yV": 0, "mass": 60, "radius": 75, "fixed": true},
+    {"time": 10000, "x": 2000, "y": -300, "xV": 0, "yV": 0, "mass": 90, "radius": 120, "fixed": false}
+  ],
+  "spawn": [
+    {"x": 400, "y": 600}
+  ]
+}

@@ -5,72 +5,8 @@ var projectile = [];
 var c;
 var ctx;
 var bcolor = "DDEEFF";
-var id = 4;
+var id = 1;
 
-{
-  let a = {};
-  a.fixed = true;
-  a.id = '1';
-  a.x = 260;
-  a.y = 800;
-  a.xV = 0;
-  a.yV = 0;
-  a.xA = 0;
-  a.yA = 0;
-  a.mass = 25;
-  a.radius = 60;
-
-  planet.push(a);
-
-  let b = Object.assign({}, a);
-  b.fixed = false;
-  b.id = '2';
-  b.x = 500;
-  b.y = 250;
-  b.xV = .12;
-  b.yV = .2;
-
-  planet.push(b);
-
-  let c = Object.assign({}, a);
-  c.id = '3';
-  c.fixed = false;
-  c.y = 100;
-  c.mass = 60;
-  c.radius = 75;
-
-  planet.push(c);
-
-  let d = Object.assign({}, a);
-  d.id = '4';
-  d.x = 1200;
-  d.y = 450;
-  d.mass = 60;
-  d.radius = 75;
-
-  planet.push(d);
-
-  let e = {};
-  e.id = '5';
-  e.x = 400;
-  e.y = 600;
-  e.xV = 0;
-  e.yV = 0;
-  e.xV2 = 0;
-  e.yV2 = 0;
-  e.xA = 0;
-  e.yA = 0;
-  e.mass = 0.5;
-  e.radius = 3;
-  e.orientation = Math.PI / 2;
-  e.on = '0';
-  e.press = false;
-  e.jump = false;
-  e.shoot = 0;
-  e.facing = true; //right = true; left = false;
-
-  entity.push(e);
-}
 
 window.onload = function(){
   c = document.getElementById('canvas');
@@ -192,11 +128,81 @@ window.onload = function(){
     }
   }, false);
   document.getElementById('clear').addEventListener('click', clear);
+  document.getElementById('open').addEventListener('click', function(){load(document.getElementById('file').files)});
+  document.getElementById('load').addEventListener('click', function(){request(document.getElementById('world').value)});
+
+  request(1);
+}
+
+function request(num){
+  $.get("world"+num, function(data, status){
+    build(data);
+  });
+}
+
+function load(file){
+  let r = new FileReader();
+  r.readAsText(file[0]);
+  r.onload = function(e){build(JSON.parse(e.target.result))}
+}
+
+function build(world){
+  clear();
+  for (let i in world.planet){
+    (function(j){
+      setTimeout(function(){create(world.planet[j])}, world.planet[j].time);
+    })(i)
+  }
+  for (let i in world.spawn){
+    spawn(world.spawn[i])
+  }
+}
+
+function spawn(loc){
+  let e = {};
+  e.id = id;
+  id+=1;
+  e.x = loc.x;
+  e.y = loc.y;
+  e.xV = 0;
+  e.yV = 0;
+  e.xV2 = 0;
+  e.yV2 = 0;
+  e.xA = 0;
+  e.yA = 0;
+  e.mass = 0.5;
+  e.radius = 3;
+  e.orientation = Math.PI / 2;
+  e.on = '0';
+  e.press = false;
+  e.jump = false;
+  e.shoot = 0;
+  e.facing = true; //right = true; left = false;
+
+  entity.push(e);
+}
+
+function create(pnet){
+  let p = {};
+  p.mass = pnet.mass;
+  p.radius = pnet.radius;
+  p.x = pnet.x;
+  p.y = pnet.y;
+  p.fixed = pnet.fixed;
+  p.xV = pnet.xV;
+  p.yV = pnet.yV;
+  p.xA = 0;
+  p.yA = 0;
+  p.id = id;
+  id+=1;
+  planet.push(p);
 }
 
 function clear(){
   entity = [];
   planet = [];
+  projectile = [];
+  id = 1;
 }
 
 function update(){
@@ -210,7 +216,6 @@ function update(){
 
         //if collision
         if (Math.sqrt(r) <= planet[i].radius + planet[j].radius){
-          //eventually put code for rebound here
           r = Math.pow(planet[i].radius + planet[j].radius,2);
         }
         let force = -1 * (planet[i].mass * planet[j].mass) / r;
@@ -327,7 +332,7 @@ function update(){
   for (let i = 0; i < projectile.length; i+=1){
     let xATemp = 0;
     let yATemp = 0;
-    projectile.life -= 1;
+    projectile[i].life -= 1;
     for (let j in planet){
       let r = Math.pow(projectile[i].x - planet[j].x,2) + Math.pow(projectile[i].y - planet[j].y, 2);
 
@@ -404,4 +409,4 @@ function draw(){
   }
 }
 
-var loop = setInterval(update, 1);
+var loop = setInterval(update, 3);

@@ -9,6 +9,9 @@ app.get("/", function(req, res) {
 app.get("/Physics.js", function(req, res) {
   res.sendFile(__dirname + "/Physics.js");
 });
+app.get("/world*", function(req, res) {
+  res.sendFile(__dirname + "/Worlds" + req.url + ".json");
+});
 
 console.log("Listening...")
 app.listen(80);

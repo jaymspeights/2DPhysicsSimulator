@@ -12,78 +12,169 @@ window.onload = function(){
   c = document.getElementById('canvas');
   ctx = c.getContext('2d');
   c.width = window.innerWidth - 25;
-  c.height = window.innerHeight - 65;
+  c.height = window.innerHeight - .1 * window.innerHeight;
   document.addEventListener('keydown', (event) => {
     let key = event.key;
-    for (let i in entity){
-      if (key == 'd' && entity[i].press == false){
-        if (entity[i].on != '0') {
+    if (key == 'd'){
+      for (let i in entity){
+        if (entity[i].on != '0' && entity[i].press == false) {
           entity[i].jump = true;
           entity[i].press = true;
           entity[i].xV += -1 * Math.cos(Math.PI/2 - entity[i].orientation + .05)*.55;
           entity[i].yV += Math.sin(Math.PI/2 - entity[i].orientation + .05)*.55;
           entity[i].facing = true;
         }
-        else{
-          entity[i].orientation += Math.PI/8;
+        else if(entity[i].press == false){
+          entity[i].orientation += Math.PI/6;
           entity[i].press = true;
         }
+        if(document.getElementById('combat').checked){
+          break;
+        }
       }
-      else if (key == 'a' && entity[i].press == false){
-        if (entity[i].on != '0') {
+    }
+    else if (key == 'a'){
+      for (let i in entity){
+        if (entity[i].on != '0' && entity[i].press == false) {
           entity[i].jump = true;
           entity[i].press = true;
           entity[i].xV += Math.cos(Math.PI/2 - entity[i].orientation - .05)*.55;
           entity[i].yV += -1 * Math.sin(Math.PI/2 - entity[i].orientation - .05)*.55;
           entity[i].facing = false;
         }
-        else{
-          entity[i].orientation -= Math.PI/8;
+        else if (entity[i].press == false){
+          entity[i].orientation -= Math.PI/6;
           entity[i].press = true;
         }
+        if(document.getElementById('combat').checked){
+          break;
+        }
       }
-      else if (key == "w" && entity[i].on != '0' && entity[i].press == false){
-        entity[i].jump = true;
-        entity[i].press = true;
-        entity[i].xV += Math.cos(entity[i].orientation)*.6;
-        entity[i].yV += Math.sin(entity[i].orientation)*.6;
+    }
+    else if (key == "w"){
+      for (let i in entity){
+        if (entity[i].on != '0'){
+          entity[i].jump = true;
+          entity[i].press = true;
+          entity[i].xV += Math.cos(entity[i].orientation)*.6;
+          entity[i].yV += Math.sin(entity[i].orientation)*.6;
+        }
+        if(document.getElementById('combat').checked){
+          break;
+        }
       }
-      else if (key == " " && entity[i].shoot == 0){
-        entity[i].shoot = 50; //shoot delay
+    }
+    else if (key == "s"){
+      for (let i in entity){
+        if (entity[i].shoot == 0){
+          entity[i].shoot = 50; //shoot delay
+          let p = {}
+          p.x = entity[i].x;
+          p.y = entity[i].y;
+          let dir = entity[i].facing?entity[i].orientation+Math.PI/2:entity[i].orientation-Math.PI/2;
+          p.xV = entity[i].xV + Math.cos(dir) * 2; //power of gun
+          p.yV = entity[i].yV + Math.sin(dir) * 2;
+          p.xA = 0;
+          p.yA = 0;
+          p.radius = 1;
+          p.mass = .0001;
+          p.life = 10000;
+          p.damage = 25;
+          p.id = entity[i].id;
+          projectile.push(p);
+        }
+        if(document.getElementById('combat').checked){
+          break;
+        }
+      }
+    }
+
+    //player two controls
+    if (typeof entity[1] != "undefined" && document.getElementById('combat').checked){
+      if (key == 'ArrowRight' && entity[1].press == false){
+        if (entity[1].on != '0') {
+          entity[1].jump = true;
+          entity[1].press = true;
+          entity[1].xV += -1 * Math.cos(Math.PI/2 - entity[1].orientation + .05)*.55;
+          entity[1].yV += Math.sin(Math.PI/2 - entity[1].orientation + .05)*.55;
+          entity[1].facing = true;
+        }
+        else if (entity[1].press == false){
+          entity[1].orientation += Math.PI/6;
+          entity[1].press = true;
+        }
+      }
+      else if (key == 'ArrowLeft' && entity[1].press == false){
+        if (entity[1].on != '0') {
+          entity[1].jump = true;
+          entity[1].press = true;
+          entity[1].xV += Math.cos(Math.PI/2 - entity[1].orientation - .05)*.55;
+          entity[1].yV += -1 * Math.sin(Math.PI/2 - entity[1].orientation - .05)*.55;
+          entity[1].facing = false;
+        }
+        else if (entity[1].press == false){
+          entity[1].orientation -= Math.PI/6;
+          entity[1].press = true;
+        }
+      }
+      else if (key == "ArrowUp" && entity[1].on != '0' && entity[1].press == false){
+        entity[1].jump = true;
+        entity[1].press = true;
+        entity[1].xV += Math.cos(entity[1].orientation)*.6;
+        entity[1].yV += Math.sin(entity[1].orientation)*.6;
+      }
+      else if (key == "ArrowDown" && entity[1].shoot == 0){
+        entity[1].shoot = 50; //shoot delay
         let p = {}
-        p.x = entity[i].x;
-        p.y = entity[i].y;
-        let dir = entity[i].facing?entity[i].orientation+Math.PI/2:entity[i].orientation-Math.PI/2;
-        p.xV = entity[i].xV + Math.cos(dir) * 1; //power of gun
-        p.yV = entity[i].yV + Math.sin(dir) * 1;
+        p.x = entity[1].x;
+        p.y = entity[1].y;
+        let dir = entity[1].facing?entity[1].orientation+Math.PI/2:entity[1].orientation-Math.PI/2;
+        p.xV = entity[1].xV + Math.cos(dir) * 2; //power of gun
+        p.yV = entity[1].yV + Math.sin(dir) * 2;
         p.xA = 0;
         p.yA = 0;
         p.radius = 1;
         p.mass = .0001;
         p.life = 10000;
         p.damage = 25;
-        p.id = entity[i].id;
+        p.id = entity[1].id;
         projectile.push(p);
-
-      }
-      else {
-      }
-      if(document.getElementById('combat').checked){
-        break;
       }
     }
   }, false);
   document.addEventListener('keyup', (event) => {
     let key = event.key;
-    for (let i in entity){
+    if (!document.getElementById('combat').checked){
+      for (let i in entity){
+        if (key == 'd'){
+          entity[i].press = false;
+        }
+        else if (key == 'a'){
+          entity[i].press = false;
+        }
+        else if (key == "w"){
+          entity[i].press = false;
+        }
+      }
+    }
+    else{
       if (key == 'd'){
-        entity[i].press = false;
+        entity[0].press = false;
       }
       else if (key == 'a'){
-        entity[i].press = false;
+        entity[0].press = false;
       }
       else if (key == "w"){
-        entity[i].press = false;
+        entity[0].press = false;
+      }
+      else if (key == 'ArrowRight' && typeof entity[1] != "undefined"){
+        entity[1].press = false;
+      }
+      else if (key == 'ArrowLeft' && typeof entity[1] != "undefined"){
+        entity[1].press = false;
+      }
+      else if (key == "ArrowUp" && typeof entity[1] != "undefined"){
+        entity[1].press = false;
       }
     }
   }, false);
@@ -175,7 +266,7 @@ function spawn(loc){
   e.xA = 0;
   e.yA = 0;
   e.mass = 0.5;
-  e.radius = 3;
+  e.radius = 9;
   e.orientation = Math.PI / 2;
   e.on = '0';
   e.press = false;
@@ -241,11 +332,6 @@ function update(){
       planet[i].y += planet[i].yV;
 
       if (document.getElementById('bound').checked){
-        if (planet[i].y + planet[i].radius < 0 || planet[i].y - planet[i].radius > c.height || planet[i].x + planet[i].radius < 0 || planet[i].x - planet[i].radius > c.width){
-          planet.splice(i,1);
-          i-=1;
-          continue;
-        }
         //y collision detection
         if (planet[i].y - planet[i].radius < 0){
           planet[i].y = (planet[i].y - planet[i].radius) * -1 + planet[i].radius;
@@ -267,6 +353,11 @@ function update(){
         }
       }
 
+    }
+    if (planet[i].y + planet[i].radius < 0 || planet[i].y - planet[i].radius > c.height || planet[i].x + planet[i].radius < 0 || planet[i].x - planet[i].radius > c.width){
+      planet.splice(i,1);
+      i-=1;
+      continue;
     }
   }
 
@@ -349,8 +440,9 @@ function update(){
 
       //if collision
       if (Math.sqrt(r) <= projectile[i].radius + planet[j].radius){
-        projectile[i].flag = true;
-        break;
+        // projectile[i].flag = true;
+        // break;
+        r = Math.pow(projectile[i].radius + planet[j].radius,2);
       }
       let force = -1 * (projectile[i].mass * planet[j].mass) / r;
       let forceX = force * (projectile[i].x - planet[j].x) / Math.sqrt(r);

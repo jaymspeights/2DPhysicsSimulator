@@ -61,11 +61,15 @@ window.onload = function(){
         p.radius = 1;
         p.mass = .0001;
         p.life = 10000;
+        p.damage = 25;
         p.id = entity[i].id;
         projectile.push(p);
 
       }
       else {
+      }
+      if(document.getElementById('combat').checked){
+        break;
       }
     }
   }, false);
@@ -177,6 +181,8 @@ function spawn(loc){
   e.press = false;
   e.jump = false;
   e.shoot = 0;
+  e.hp = 100;
+  e.flag = false;
   e.facing = true; //right = true; left = false;
 
   entity.push(e);
@@ -264,7 +270,12 @@ function update(){
     }
   }
 
-  for (let i in entity){
+  for (let i = 0; i < entity.length; i+=1){
+    if (entity[i].hp<=0){
+      entity.splice(i, 1);
+      i-=1;
+      continue;
+    }
     if (entity[i].shoot>0)
       entity[i].shoot -=1;
     else {
@@ -347,6 +358,17 @@ function update(){
 
       xATemp += forceX/projectile[i].mass;
       yATemp += forceY/projectile[i].mass;
+    }
+    for (let j in entity){
+      if (projectile[i].id == entity[j].id) continue;
+      let r = Math.pow(projectile[i].x - entity[j].x,2) + Math.pow(projectile[i].y - entity[j].y, 2);
+
+      //if collision
+      if (Math.sqrt(r) <= projectile[i].radius + entity[j].radius){
+        projectile[i].flag = true;
+        entity[j].hp -= projectile[i].damage;
+        break;
+      }
     }
     if (projectile[i].flag == true || projectile[i].life <=0){
       projectile.splice(i,1);

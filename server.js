@@ -11,4 +11,4 @@ app.get("/Physics.js", function(req, res) {
 });
 
 console.log("Listening...")
-app.listen(8000);
+app.listen(80);

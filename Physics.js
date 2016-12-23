@@ -163,7 +163,7 @@ function clear(){
 }
 
 function update(){
-  for (let i in planet){
+  for (let i = 0; i < planet.length; i+=1){
     if (!planet[i].fixed){
       let xATemp = 0;
       let yATemp = 0;
@@ -187,29 +187,38 @@ function update(){
       planet[i].xV += planet[i].xA;
       planet[i].x += planet[i].xV;
 
-      // //x collision detection
-      // if (planet[i].x - planet[i].radius < 0){
-      //   planet[i].x = (planet[i].x - planet[i].radius) * -1 + planet[i].radius;
-      //   planet[i].xV = planet[i].xV * -1;
-      // }
-      // if (planet[i].x + planet[i].radius > c.width){
-      //   planet[i].x = (c.width - planet[i].x - planet[i].radius) + c.width - planet[i].radius;
-      //   planet[i].xV = planet[i].xV * -1;
-      // }
 
       planet[i].yA = yATemp;
       planet[i].yV += planet[i].yA;
       planet[i].y += planet[i].yV;
 
-      // //y collision detection
-      // if (planet[i].y - planet[i].radius < 0){
-      //   planet[i].y = (planet[i].y - planet[i].radius) * -1 + planet[i].radius;
-      //   planet[i].yV = planet[i].yV * -1;
-      // }
-      // if (planet[i].y + planet[i].radius > c.height){
-      //   planet[i].y = (c.height - planet[i].y - planet[i].radius) + c.height - planet[i].radius;
-      //   planet[i].yV = planet[i].yV * -1;
-      // }
+      if (document.getElementById('bound').checked){
+        if (planet[i].y + planet[i].radius < 0 || planet[i].y - planet[i].radius > c.height || planet[i].x + planet[i].radius < 0 || planet[i].x - planet[i].radius > c.width){
+          planet.splice(i,1);
+          i-=1;
+          continue;
+        }
+        //y collision detection
+        if (planet[i].y - planet[i].radius < 0){
+          planet[i].y = (planet[i].y - planet[i].radius) * -1 + planet[i].radius;
+          planet[i].yV = planet[i].yV * -1;
+        }
+        if (planet[i].y + planet[i].radius > c.height){
+          planet[i].y = (c.height - planet[i].y - planet[i].radius) + c.height - planet[i].radius;
+          planet[i].yV = planet[i].yV * -1;
+        }
+
+        //x collision detection
+        if (planet[i].x - planet[i].radius < 0){
+          planet[i].x = (planet[i].x - planet[i].radius) * -1 + planet[i].radius;
+          planet[i].xV = planet[i].xV * -1;
+        }
+        if (planet[i].x + planet[i].radius > c.width){
+          planet[i].x = (c.width - planet[i].x - planet[i].radius) + c.width - planet[i].radius;
+          planet[i].xV = planet[i].xV * -1;
+        }
+      }
+
     }
   }
 

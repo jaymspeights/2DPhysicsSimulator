@@ -10,7 +10,7 @@ var scale = 1;
 var mouseX;
 var mouseY;
 var center = {"x":0, "y":0};
-
+var delay;
 
 window.onload = function(){
   c = document.getElementById('canvas');
@@ -203,8 +203,8 @@ window.onload = function(){
       let p = {};
       id+=1;
       p.id = id.toString();
-      p.x = Number(x)*scale + center.x;
-      p.y = Number(y)*scale + center.y;
+      p.x = (Number(x)-2*center.x)*scale + center.x;
+      p.y = (Number(y)-2*center.y)*scale + center.y;
       p.xV = 0;
       p.yV = 0;
       p.xA = 0;
@@ -271,9 +271,10 @@ function load(file){
 
 function build(world){
   clear();
+  if (typeof world.scale != "undefined") scale = world.scale;
   for (let i in world.planet){
     (function(j){
-      setTimeout(function(){create(world.planet[j])}, world.planet[j].time);
+      delay=setTimeout(function(){create(world.planet[j])}, world.planet[j].time);
     })(i)
   }
   for (let i in world.spawn){
@@ -329,6 +330,7 @@ function clear(){
   projectile = [];
   id = 1;
   scale = 1;
+  clearInterval(delay);
 }
 
 function update(){
@@ -534,7 +536,6 @@ function draw(){
   ctx.fillStyle = "#000000";
 
   if(mouseY < c.height && mouseY > 0){
-    console.log(mouseY, c.height, c.offsetTop)
     let xd = mouseX - c.width/2;
     let yd = mouseY - c.height/2;
     let r = Math.pow(Math.pow(xd,2) + Math.pow(yd,2),.5);

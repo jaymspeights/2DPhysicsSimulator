@@ -6,6 +6,10 @@ var c;
 var ctx;
 var bcolor = "DDEEFF";
 var id = 1;
+var scale = 1;
+var mouseX;
+var mouseY;
+var center = {"x":0, "y":0};
 
 
 window.onload = function(){
@@ -13,6 +17,10 @@ window.onload = function(){
   ctx = c.getContext('2d');
   c.width = window.innerWidth - 25;
   c.height = window.innerHeight - .1 * window.innerHeight;
+  mouseX = c.width/2;
+  mouseY = c.height/2;
+  center.x = 0;
+  center.y = 0;
   document.addEventListener('keydown', (event) => {
     let key = event.key;
     if (key == 'd'){
@@ -76,9 +84,9 @@ window.onload = function(){
           p.yV = entity[i].yV + Math.sin(dir) * 2;
           p.xA = 0;
           p.yA = 0;
-          p.radius = 1;
+          p.radius = 2;
           p.mass = .0001;
-          p.life = 10000;
+          p.life = 3000;
           p.damage = 25;
           p.id = entity[i].id;
           projectile.push(p);
@@ -133,9 +141,9 @@ window.onload = function(){
         p.yV = entity[1].yV + Math.sin(dir) * 2;
         p.xA = 0;
         p.yA = 0;
-        p.radius = 1;
+        p.radius = 2;
         p.mass = .0001;
-        p.life = 10000;
+        p.life = 3000;
         p.damage = 25;
         p.id = entity[1].id;
         projectile.push(p);
@@ -179,17 +187,24 @@ window.onload = function(){
     }
   }, false);
 
+  document.addEventListener('mousewheel', (event) => {
+    scale *= 1 - event.wheelDelta/1200;
+  });
+
+  document.addEventListener('mousemove', (event) => {
+    mouseX = event.pageX - c.offsetLeft;
+    mouseY = event.pageY - c.offsetTop;
+  });
 
   document.addEventListener('mousedown', (event) => {
     let x = event.pageX - c.offsetLeft;
     let y = event.pageY - c.offsetTop;
     if (document.getElementById('mass').value != "" && document.getElementById('radius').value != "" && document.getElementById('pc').checked && x>=0 && x<c.width && y>=0 && y<c.height){
-      console.log("creating player")
       let p = {};
       id+=1;
       p.id = id.toString();
-      p.x = Number(x);
-      p.y = Number(y);
+      p.x = Number(x)*scale + center.x;
+      p.y = Number(y)*scale + center.y;
       p.xV = 0;
       p.yV = 0;
       p.xA = 0;
@@ -202,7 +217,6 @@ window.onload = function(){
       p.on = '0';
       p.press = false;
       p.jump = false;
-      console.log(p)
       entity.push(p);
     }
     else if (document.getElementById('mass').value != "" && document.getElementById('radius').value != "" && x>=0 && x<c.width && y>=0 && y<c.height){
@@ -210,8 +224,8 @@ window.onload = function(){
       p.fixed = document.getElementById('static').checked;
       id+=1;
       p.id = id.toString();
-      p.x = x;
-      p.y = y;
+      p.x = Number(x)*scale + center.x;
+      p.y = Number(y)*scale + center.y;
       p.xV = 0;
       p.yV = 0;
       p.xA = 0;
@@ -223,10 +237,24 @@ window.onload = function(){
     }
   }, false);
   document.getElementById('clear').addEventListener('click', clear);
+  document.getElementById('pause').addEventListener('click', pause);
   document.getElementById('open').addEventListener('click', function(){load(document.getElementById('file').files)});
   document.getElementById('load').addEventListener('click', function(){request(document.getElementById('world').value)});
 
   request(1);
+}
+
+function pause(){
+  if (document.getElementById('pause').innerHTML == "Pause"){
+    clearInterval(loop);
+    loop = setInterval(draw, 3);
+    document.getElementById('pause').innerHTML = "Play";
+  }
+  else {
+    clearInterval(loop);
+    loop = setInterval(update, 3);
+    document.getElementById('pause').innerHTML = "Pause";
+  }
 }
 
 function request(num){
@@ -300,6 +328,7 @@ function clear(){
   planet = [];
   projectile = [];
   id = 1;
+  scale = 1;
 }
 
 function update(){
@@ -332,6 +361,11 @@ function update(){
       planet[i].y += planet[i].yV;
 
       if (document.getElementById('bound').checked){
+        if (planet[i].y + planet[i].radius < 0 || planet[i].y - planet[i].radius > c.height || planet[i].x + planet[i].radius < 0 || planet[i].x - planet[i].radius > c.width){
+          planet.splice(i,1);
+          i-=1;
+          continue;
+        }
         //y collision detection
         if (planet[i].y - planet[i].radius < 0){
           planet[i].y = (planet[i].y - planet[i].radius) * -1 + planet[i].radius;
@@ -352,12 +386,6 @@ function update(){
           planet[i].xV = planet[i].xV * -1;
         }
       }
-
-    }
-    if (planet[i].y + planet[i].radius < 0 || planet[i].y - planet[i].radius > c.height || planet[i].x + planet[i].radius < 0 || planet[i].x - planet[i].radius > c.width){
-      planet.splice(i,1);
-      i-=1;
-      continue;
     }
   }
 
@@ -476,10 +504,12 @@ function update(){
     projectile[i].yV += projectile[i].yA;
     projectile[i].y += projectile[i].yV;
 
-    if (projectile[i].y + projectile[i].radius < 0 || projectile[i].y - projectile[i].radius > c.height || projectile[i].x + projectile[i].radius < 0 || projectile[i].x - projectile[i].radius > c.width){
-      projectile.splice(i,1);
-      i-=1;
-      continue;
+    if (document.getElementById('bound').checked){
+      if (projectile[i].y + projectile[i].radius < 0 || projectile[i].y - projectile[i].radius > c.height || projectile[i].x + projectile[i].radius < 0 || projectile[i].x - projectile[i].radius > c.width){
+        projectile.splice(i,1);
+        i-=1;
+        continue;
+      }
     }
 
   }
@@ -502,23 +532,45 @@ function draw(){
   ctx.fillStyle = "#" + bcolor;
   ctx.fillRect(0, 0, c.width, c.height);
   ctx.fillStyle = "#000000";
+
+  if(mouseY < c.height && mouseY > 0){
+    console.log(mouseY, c.height, c.offsetTop)
+    let xd = mouseX - c.width/2;
+    let yd = mouseY - c.height/2;
+    let r = Math.pow(Math.pow(xd,2) + Math.pow(yd,2),.5);
+    if (r>c.height/2.5){
+      let xMov = Math.pow(Math.pow(r,2)-Math.pow(yd,2),.5);
+      let yMov = Math.pow(Math.pow(r,2)-Math.pow(xd,2),.5);
+      if (xd<0) xMov = xMov*-1;
+      if (yd<0) yMov = yMov*-1;
+      center.x -= xMov/750;
+      center.y -= yMov/500;
+    }
+  }
+
   for (let i in planet){
+    let x = (planet[i].x - center.x)/scale + 2*center.x;
+    let y = (planet[i].y - center.y)/scale + 2*center.y;
     ctx.beginPath();
-    ctx.arc(planet[i].x, planet[i].y, planet[i].radius, 2*Math.PI, 0);
+    ctx.arc(x, y, planet[i].radius/scale, 2*Math.PI, 0);
     ctx.stroke();
   }
   for (let i in entity){
+    let x = (entity[i].x - center.x)/scale + 2*center.x;
+    let y = (entity[i].y - center.y)/scale + 2*center.y;
     ctx.beginPath();
-    ctx.arc(entity[i].x, entity[i].y, entity[i].radius, 2*Math.PI, 0);
+    ctx.arc(x, y, entity[i].radius/scale, 2*Math.PI, 0);
     ctx.stroke();
-    ctx.moveTo(entity[i].x, entity[i].y);
+    ctx.moveTo(x, y);
     let dir = entity[i].facing?entity[i].orientation+Math.PI/2:entity[i].orientation-Math.PI/2;
-    ctx.lineTo(entity[i].x+entity[i].radius*2*Math.cos(dir),entity[i].y+entity[i].radius*2*Math.sin(dir));
+    ctx.lineTo(x+entity[i].radius*2/scale*Math.cos(dir),y+entity[i].radius*2/scale*Math.sin(dir));
     ctx.stroke();
   }
   for (let i in projectile){
+    let x = (projectile[i].x - center.x)/scale + 2*center.x;
+    let y = (projectile[i].y - center.y)/scale + 2*center.y;
     ctx.beginPath();
-    ctx.arc(projectile[i].x, projectile[i].y, projectile[i].radius, 2*Math.PI, 0);
+    ctx.arc(x, y, projectile[i].radius/scale, 2*Math.PI, 0);
     ctx.stroke();
   }
 }

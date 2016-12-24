@@ -6,9 +6,14 @@ app.get("/", function(req, res) {
   res.sendFile(__dirname + "/index.html");
 });
 
-app.get("/Physics.js", function(req, res) {
-  res.sendFile(__dirname + "/Physics.js");
+app.get("/*.js", function(req, res) {
+  res.sendFile(__dirname + req.url);
 });
+
+app.get("/*.css", function(req, res) {
+  res.sendFile(__dirname + req.url);
+});
+
 app.get("/world*", function(req, res) {
   res.sendFile(__dirname + "/Worlds" + req.url + ".json");
 });

@@ -11,12 +11,13 @@ var mouseX;
 var mouseY;
 var center = {"x":0, "y":0};
 var delay;
+var loop;
 
-window.onload = function(){
+function start(){
   c = document.getElementById('canvas');
   ctx = c.getContext('2d');
   c.width = window.innerWidth - 25;
-  c.height = window.innerHeight - .1 * window.innerHeight;
+  c.height = window.innerHeight - 25;
   mouseX = c.width/2;
   mouseY = c.height/2;
   center.x = 0;
@@ -241,6 +242,8 @@ window.onload = function(){
   document.getElementById('open').addEventListener('click', function(){load(document.getElementById('file').files)});
   document.getElementById('load').addEventListener('click', function(){request(document.getElementById('world').value)});
 
+  loop = setInterval(update, 3);
+
   request(1);
 }
 
@@ -330,6 +333,8 @@ function clear(){
   projectile = [];
   id = 1;
   scale = 1;
+  center.x = 0;
+  center.y = 0;
   clearInterval(delay);
 }
 
@@ -575,5 +580,3 @@ function draw(){
     ctx.stroke();
   }
 }
-
-var loop = setInterval(update, 3);

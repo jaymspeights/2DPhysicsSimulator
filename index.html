@@ -3,51 +3,72 @@
   <head>
     <meta charset="utf-8">
     <title>Physics!</title>
+    <script src="/Physics.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/ui.js"></script>
+    <link rel="stylesheet" type="text/css" href="/main.css">
   </head>
   <body>
-    <script src="Physics.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <canvas id="canvas"></canvas>
-    <style>
-      .stack {
-        float: left;
-        padding: 5px;
-      }
-      .plain {
-        list-style-type: none;
-      }
-      a {
-        padding-left: 10px;
-      }
-    </style>
-    <ul class="plain">
-      <li>
-        <ul class="plain">
-          <li class="stack"><select id="world">
-            <option value="1">World 1</option>
-            <option value="2">World 2</option>
-            <option value="3">World 3</option>
-          </select></li>
-          <li class="stack"><button id="load">Load</button></li>
-          <li class="stack"><a>Combat</a><input type="checkbox" id="combat" value=""></li>
-          <li class="stack"><input type="text" id="mass" value="" placeholder="Mass"></li>
-          <li class="stack"><input type="text" id="radius" value="" placeholder="Radius"></li>
-          <li class="stack"><a>Static</a><input type="checkbox" id="static" value=""></li>
-          <li class="stack"><a>Player Controlled</a><input type="checkbox" id="pc" value=""></li>
-        </ul>
-      </li>
-
-      <li>
-        <ul class="plain">
-          <li class="stack"><button id="clear">Clear</button></li>
-          <li class="stack"><button id="pause">Pause</button></li>
-          <li class="stack"><input type="text" id="bcolor" value="" placeholder="Background Color"></li>
-          <li class="stack"><a>Boundries</a><input type="checkbox" id="bound" value=""></li>
-          <li class="stack"><a>CONTROLS: (A) (D) (W) (S)</a></li>
-          <li class="stack"><a>Load World File</a><input type="file" id="file"></li>
-          <li class="stack"><button id="open">Open</button></li>
-        </ul>
-      </li>
-    </ul>
+    <canvas class="full" id="canvas"></canvas>
+    <div class="corner">
+      <ul>
+        <li>
+          <h2 id="control_h2">Controls</h2>
+          <div style="display:none" id="control_div">
+            <div class="line">
+              <p>Combat</p>
+              <input type="checkbox" id="combat" value="">
+            </div>
+            <div class="line">
+              <p>CONTROLS: (A) (D) (W) (S)</p>
+            </div>
+          </div>
+        </li>
+        <li>
+          <h2 id="select_h2">World Select</h2>
+          <div style="display:none" id="select_div">
+            <div class="line">
+              <select id="world">
+                <option value="1">World 1</option>
+                <option value="2">World 2</option>
+                <option value="3">World 3</option>
+              </select>
+              <button id="load">Load</button>
+            </div>
+            <div class="line">
+              <input type="file" id="file">
+              <button id="open">Open</button>
+            </div>
+          </div>
+        </li>
+        <li>
+          <h2 id="dev_h2">Dev Tools</h2>
+          <div style="display:none" id="dev_div">
+            <div class="line">
+              <button id="clear">Clear</button>
+              <button id="pause">Pause</button>
+            </div>
+            <div class="line">
+              <input style="max-width:40%" type="text" id="mass" value="" placeholder="Mass">
+              <input style="max-width:40%" type="text" id="radius" value="" placeholder="Radius">
+              <div class="softline">
+                <p>Static</p>
+                <input type="checkbox" id="static" value="">
+              </div>
+              <div class="softline">
+                <p>Player Controlled</p>
+                <input type="checkbox" id="pc" value="">
+              </div>
+            </div>
+            <div class="line">
+              <p>Boundries</p><input type="checkbox" id="bound" value="">
+            </div>
+            <div class="line">
+              <input type="text" id="bcolor" value="" placeholder="Background Color">
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
   </body>
 </html>
